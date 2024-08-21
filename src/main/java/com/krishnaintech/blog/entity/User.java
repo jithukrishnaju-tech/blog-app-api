@@ -6,6 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "user")
 @NoArgsConstructor
@@ -23,4 +27,7 @@ public class User {
     @Column(nullable = false)
     private String password;
     private String about;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Post> postList = new ArrayList<>();
 }
