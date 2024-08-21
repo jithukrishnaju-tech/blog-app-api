@@ -3,6 +3,7 @@ package com.krishnaintech.blog.controller;
 import com.krishnaintech.blog.payload.ApiResponseDto;
 import com.krishnaintech.blog.payload.UserDto;
 import com.krishnaintech.blog.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,13 +20,13 @@ public class UserController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<UserDto> userRegister(@RequestBody UserDto userDto){
+    public ResponseEntity<UserDto> userRegister(@Valid @RequestBody UserDto userDto){
         UserDto user = userService.createUser(userDto);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto, @PathVariable("id") Integer id){
+    public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UserDto userDto, @PathVariable("id") Integer id){
         UserDto user = userService.updateUser(userDto, id);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }

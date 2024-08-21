@@ -5,22 +5,25 @@ import com.krishnaintech.blog.exceptions.ResourceNotFoundException;
 import com.krishnaintech.blog.payload.UserDto;
 import com.krishnaintech.blog.repository.UserRepo;
 import com.krishnaintech.blog.service.UserService;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 @Service
 public class UserServiceImp implements UserService {
     private final UserRepo userRepo;
+    private final ModelMapper modelMapper;
 
-    public UserServiceImp(UserRepo userRepo) {
+    public UserServiceImp(UserRepo userRepo, ModelMapper modelMapper) {
         this.userRepo = userRepo;
+        this.modelMapper = modelMapper;
     }
 
     @Override
     public UserDto createUser(UserDto userDto) {
-        User user = userDto.dtoToUser();
+        User user = this.DtoToUser(userDto);
         User userCreated = userRepo.save(user);
-        return userDto.userToDto(userCreated);
+        return this.userToDto(userCreated);
     }
 
     @Override
@@ -31,25 +34,31 @@ public class UserServiceImp implements UserService {
         userExisting.setPassword(userDto.getPassword());
         userExisting.setAbout(userDto.getAbout());
         User user = userRepo.save(userExisting);
-        return userDto.userToDto(user);
+        return this.userToDto(user);
     }
 
     @Override
     public UserDto getUserById(Integer userId) {
         User existingUser = userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
-        UserDto userDto = new UserDto();
-        return userDto.userToDto(existingUser);
+        return this.userToDto(existingUser);
     }
 
     @Override
     public List<UserDto> getAllUser() {
         List<User> users = userRepo.findAll();
-        return users.stream().map((user) -> new UserDto().userToDto(user)).toList();
+        return users.stream().map(this::userToDto).toList();
     }
 
     @Override
     public void deleteUser(Integer userId) {
         User existingUser = userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
         userRepo.delete(existingUser);
+    }
+
+    public UserDto userToDto(User user){
+        return modelMapper.map(user, UserDto.class);
+    }
+    public User DtoToUser(UserDto userDto){
+        return modelMapper.map(userDto, User.class);
     }
 }
