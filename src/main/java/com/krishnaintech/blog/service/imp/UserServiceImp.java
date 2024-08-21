@@ -8,7 +8,10 @@ import com.krishnaintech.blog.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class UserServiceImp implements UserService {
     private final UserRepo userRepo;
@@ -21,9 +24,9 @@ public class UserServiceImp implements UserService {
 
     @Override
     public UserDto createUser(UserDto userDto) {
-        User user = this.DtoToUser(userDto);
+        User user = modelMapper.map(userDto, User.class);
         User userCreated = userRepo.save(user);
-        return this.userToDto(userCreated);
+        return modelMapper.map(user, UserDto.class);
     }
 
     @Override
@@ -34,19 +37,19 @@ public class UserServiceImp implements UserService {
         userExisting.setPassword(userDto.getPassword());
         userExisting.setAbout(userDto.getAbout());
         User user = userRepo.save(userExisting);
-        return this.userToDto(user);
+        return modelMapper.map(user, UserDto.class);
     }
 
     @Override
     public UserDto getUserById(Integer userId) {
         User existingUser = userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
-        return this.userToDto(existingUser);
+        return modelMapper.map(existingUser, UserDto.class);
     }
 
     @Override
     public List<UserDto> getAllUser() {
         List<User> users = userRepo.findAll();
-        return users.stream().map(this::userToDto).toList();
+        return users.stream().map((user) -> modelMapper.map(user, UserDto.class)).toList();
     }
 
     @Override
