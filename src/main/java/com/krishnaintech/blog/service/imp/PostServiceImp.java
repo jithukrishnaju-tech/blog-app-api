@@ -83,7 +83,6 @@ public class PostServiceImp implements PostService {
     @Override
     public PostDto getPostById(Integer postId) {
         Post post = postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post","PostId",postId));
-
         return modelMapper.map(post,PostDto.class);
     }
 
